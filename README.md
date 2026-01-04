@@ -1,7 +1,9 @@
 # XYRIS_OS
-## Sercon version of XYRIS_OS!
+## Disclaimer
 
-The main ESP rendering logic is implemented in the update_data method. On git simple demo, not real code for some kind of game.
+This source code is designed to work **only with Free Fire** for the specific season/version available at the time of publication.  
+It is **not compatible with other games**, and functionality is **not guaranteed for future updates or seasons**.
+
 
 ## How to use?
 **1. Get the PID and task port of your game:**
