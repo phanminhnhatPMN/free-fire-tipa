@@ -1,5 +1,5 @@
 # XYRIS_OS
-## First version of XYRIS_OS!
+## Sercon version of XYRIS_OS!
 
 The main ESP rendering logic is implemented in the update_data method. On git simple demo, not real code for some kind of game.
 
@@ -8,31 +8,23 @@ The main ESP rendering logic is implemented in the update_data method. On git si
 ```
 Current:
 - (void)SetUpBase {
-    pid_t pid = get_pid_by_name("DeltaForceClient");
-    if (pid > 0){
-        initialize_task_port(pid);
-        task_t task = global_task_port;
-        if (task != MACH_PORT_NULL) {
-            LDVQuangBase = get_image_base_address(task, "DeltaForceClient");
-        }
-    }
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefireth");
+    });
 }
-Origin:
-// pid_t pid = get_pid_by_name("MainBinaryOfGame");
-// task_t task = get_task_by_pid(pid);
-// OR
-// task_t task = get_task_for_PID(pid); <- ezz detect
+
 ```
 
 **2. Read world addresses and pointers like this.:**
 ```c
-long Gworld = QuangRead<long>(LDVQuangBase + 0x23456789);
-long Pointer = QuangRead<long>(Gworld + 0x123);
+long Gworld = ReadAddr<long>(Moudule_Base + 0x23456789);
+long Pointer = ReadAddr<long>(Gworld + 0x123);
 
 ```
 
 ### Archive Note
-This code snippet was written in late December 2025 and illustrates how UE4 game titles like DeltaForce read and write.<br>
+This code create at 2026 by LDVQuang2306.<br>
 
 ## License
 
