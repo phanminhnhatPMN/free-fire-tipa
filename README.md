@@ -26,6 +26,12 @@ long Pointer = ReadAddr<long>(Gworld + 0x123);
 ### Archive Note
 This code create at 2026 by LDVQuang2306.<br>
 
+## Acknowledgements
+
+This project would not have been possible without the support and contributions of the open-source community. I would like to sincerely thank the following GitHub contributors for their time, knowledge, and assistance:
+
+**Fl0rk: https://github.com/Fl0rk/External_ESP_Free_Fire
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
