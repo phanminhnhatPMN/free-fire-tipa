@@ -18,7 +18,10 @@ jobs:
       - name: Setup Theos & SDKs
         run: |
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
-          git clone --depth=1 https://github.com/theos/sdks.git $HOME/theos/sdks
+          curl -LO https://github.com/theos/sdks/archive/refs/heads/master.zip
+          unzip -q master.zip
+          mkdir -p $HOME/theos/sdks
+          cp -r sdks-master/* $HOME/theos/sdks/
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
 
       - name: Build TIPA Package
