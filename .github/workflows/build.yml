@@ -28,13 +28,13 @@ jobs:
         run: |
           export THEOS=$HOME/theos
           make clean
-          make package FINALPACKAGE=1
-          ls -la packages/
+          make FINALPACKAGE=1
+          mkdir -p packages Payload
+          cp -r .theos/_/Applications/Xyris.app Payload/
+          zip -qr packages/Xyris_Custom.tipa Payload
 
       - name: Upload TIPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Xyris_FF_Custom_TIPA
-          path: |
-            packages/*.tipa
-            *.tipa
+          path: packages/Xyris_Custom.tipa
