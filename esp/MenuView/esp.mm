@@ -111,27 +111,22 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
 }
 
 - (void)setupFloatingButton {
-    floatingButton = [[UIView alloc] initWithFrame:CGRectMake(50, 50, 50, 50)];
-    floatingButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.8 blue:0.0 alpha:1.0];
-    floatingButton.layer.cornerRadius = 25;
-    floatingButton.layer.borderWidth = 2;
-    floatingButton.layer.borderColor = [UIColor whiteColor].CGColor;
-    floatingButton.clipsToBounds = YES;
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame = CGRectMake(50, 50, 50, 50);
+    btn.backgroundColor = [UIColor colorWithRed:0.0 green:0.8 blue:0.0 alpha:1.0];
+    btn.layer.cornerRadius = 25;
+    btn.layer.borderWidth = 2;
+    btn.layer.borderColor = [UIColor whiteColor].CGColor;
+    btn.clipsToBounds = YES;
+    [btn setTitle:@"M" forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    btn.titleLabel.font = [UIFont boldSystemFontOfSize:20];
+    [btn addTarget:self action:@selector(showMenu) forControlEvents:UIControlEventTouchUpInside];
     
-    UILabel *iconLabel = [[UILabel alloc] initWithFrame:floatingButton.bounds];
-    iconLabel.text = @"M";
-    iconLabel.textColor = [UIColor whiteColor];
-    iconLabel.textAlignment = NSTextAlignmentCenter;
-    iconLabel.font = [UIFont boldSystemFontOfSize:20];
-    [floatingButton addSubview:iconLabel];
-    
-    UITapGestureRecognizer *openTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showMenu)];
     UIPanGestureRecognizer *iconPan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-    [openTap requireGestureRecognizerToFail:iconPan];
+    [btn addGestureRecognizer:iconPan];
     
-    [floatingButton addGestureRecognizer:openTap];
-    [floatingButton addGestureRecognizer:iconPan];
-    
+    floatingButton = btn;
     [self addSubview:floatingButton];
 }
 
@@ -142,10 +137,11 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
     label.font = [UIFont systemFontOfSize:13];
     [view addSubview:label];
     
-    CustomSwitch *customSwitch = [[CustomSwitch alloc] initWithFrame:CGRectMake(240, y, 52, 26)];
-    customSwitch.on = isOn;
-    [customSwitch addTarget:self action:action forControlEvents:UIControlEventValueChanged];
-    [view addSubview:customSwitch];
+    UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectMake(240, y, 51, 31)];
+    sw.on = isOn;
+    sw.onTintColor = [UIColor colorWithRed:0.0 green:0.8 blue:0.0 alpha:1.0];
+    [sw addTarget:self action:action forControlEvents:UIControlEventValueChanged];
+    [view addSubview:sw];
 }
 
 - (void)setupMenuUI {
@@ -600,7 +596,6 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
 }
 
 - (void)updateFrame {
-    if (!self.window) return;
     [self SetUpBase];
     
     // Dynamic Log Update
