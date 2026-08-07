@@ -20,6 +20,6 @@ workflows:
           make package FINALPACKAGE=1
           cp packages/*.tipa $CM_BUILD_DIR/Xyris_CodeMagic.tipa
     artifacts:
-      - *.tipa
-      - packages/*.tipa
-      - Xyris_CodeMagic.tipa
+      - "packages/*.tipa"
+      - "*.tipa"
+      - "Xyris_CodeMagic.tipa"
