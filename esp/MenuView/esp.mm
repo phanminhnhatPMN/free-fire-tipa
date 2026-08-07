@@ -29,10 +29,12 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.userInteractionEnabled = YES;
         self.backgroundColor = [UIColor clearColor];
         _thumb = [[UIView alloc] initWithFrame:CGRectMake(2, 2, 22, 22)];
         _thumb.backgroundColor = [UIColor colorWithWhite:0.75 alpha:1.0];
         _thumb.layer.cornerRadius = 11;
+        _thumb.userInteractionEnabled = NO;
         [self addSubview:_thumb];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggle)];
         [self addGestureRecognizer:tap];
@@ -124,9 +126,10 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
     [floatingButton addSubview:iconLabel];
     
     UITapGestureRecognizer *openTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showMenu)];
-    [floatingButton addGestureRecognizer:openTap];
-    
     UIPanGestureRecognizer *iconPan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    [openTap requireGestureRecognizerToFail:iconPan];
+    
+    [floatingButton addGestureRecognizer:openTap];
     [floatingButton addGestureRecognizer:iconPan];
     
     [self addSubview:floatingButton];
@@ -189,6 +192,8 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
         if (i == 0) btnIcon.text = @"□";
         if (i == 1) btnIcon.text = @"-";
         if (i == 2) {
+            circle.userInteractionEnabled = YES;
+            btnIcon.userInteractionEnabled = NO;
             btnIcon.text = @"X";
             UITapGestureRecognizer *closeTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideMenu)];
             [circle addGestureRecognizer:closeTap];
@@ -358,10 +363,22 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
     [menuContainer addSubview:settingTabContainer];
     
     UILabel *stTitle = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, 200, 20)];
-    stTitle.text = @"Settings";
+    stTitle.text = @"Debug & Status";
     stTitle.textColor = [UIColor whiteColor];
     stTitle.font = [UIFont boldSystemFontOfSize:16];
     [settingTabContainer addSubview:stTitle];
+    
+    UIView *stLine = [[UIView alloc] initWithFrame:CGRectMake(15, 35, 410, 1)];
+    stLine.backgroundColor = [UIColor whiteColor];
+    [settingTabContainer addSubview:stLine];
+    
+    UILabel *statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 45, 410, 180)];
+    statusLabel.textColor = [UIColor greenColor];
+    statusLabel.font = [UIFont systemFontOfSize:11];
+    statusLabel.numberOfLines = 0;
+    statusLabel.tag = 999;
+    statusLabel.text = @"[LOG INITIALIZING...]\nWaiting for updateFrame...";
+    [settingTabContainer addSubview:statusLabel];
 }
 
 - (void)tabChanged:(UIButton *)sender {
@@ -570,14 +587,51 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
 }
 
 - (void)SetUpBase {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefireth");
-    });
+    if (Moudule_Base == -1 || Moudule_Base == 0) {
+        pid_t pid = GetGameProcesspid((char*)"freefireth");
+        if (pid == -1) pid = GetGameProcesspid((char*)"freefire");
+        if (pid == -1) pid = GetGameProcesspid((char*)"FreeFire");
+        if (pid != -1) {
+            Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefireth");
+            if (Moudule_Base == 0) Moudule_Base = (uint64_t)GetGameModule_Base((char*)"freefire");
+            if (Moudule_Base == 0) Moudule_Base = (uint64_t)GetGameModule_Base((char*)"FreeFire");
+        }
+    }
 }
 
 - (void)updateFrame {
     if (!self.window) return;
+    [self SetUpBase];
+    
+    // Dynamic Log Update
+    UILabel *statusLbl = (UILabel *)[settingTabContainer viewWithTag:999];
+    if (!statusLbl) {
+        statusLbl = (UILabel *)[menuContainer viewWithTag:999];
+    }
+    if (statusLbl) {
+        pid_t pid = GetGameProcesspid((char*)"freefireth");
+        if (pid == -1) pid = GetGameProcesspid((char*)"freefire");
+        if (pid == -1) pid = GetGameProcesspid((char*)"FreeFire");
+        if (pid == -1) pid = GetGameProcesspid((char*)"FF");
+        
+        NSString *connStr = (pid != -1 && Moudule_Base != 0 && Moudule_Base != -1) ? @"CONNECTED YES" : @"SEARCHING PROCESS...";
+        statusLbl.text = [NSString stringWithFormat:
+            @"=== FREE FIRE PROCESS DEBUG ===\n"
+            @"Status: %@\n"
+            @"Process PID: %d\n"
+            @"Module Base: 0x%llX\n"
+            @"GameFacade Offset: 0xC012848\n\n"
+            @"=== ACTIVE FEATURES ===\n"
+            @"ESP Box: %d | Bone: %d | Health: %d\n"
+            @"Name: %d | Distance: %d\n"
+            @"Aimbot: %d | FOV: %.0f | Dist: %.0fm",
+            connStr,
+            pid, (unsigned long long)Moudule_Base,
+            isBox?1:0, isBone?1:0, isHealth?1:0,
+            isName?1:0, isDis?1:0,
+            isAimbot?1:0, aimFov, aimDistance];
+    }
+
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     for (CALayer *layer in self.drawingLayers) {
@@ -664,7 +718,7 @@ bool get_IsVisible(uint64_t player) {
 
 
 - (void)renderESPToLayers:(NSMutableArray<CALayer *> *)layers {
-    if (Moudule_Base == -1) return;
+    if (Moudule_Base == -1 || Moudule_Base == 0) return;
 
     uint64_t matchGame = getMatchGame(Moudule_Base);
     uint64_t camera = CameraMain(matchGame);

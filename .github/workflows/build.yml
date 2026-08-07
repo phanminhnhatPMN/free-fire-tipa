@@ -1,0 +1,33 @@
+name: Build iOS TIPA
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-13
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+
+      - name: Build TIPA Package
+        run: |
+          export THEOS=$HOME/theos
+          make clean
+          make package FINALPACKAGE=1
+
+      - name: Upload TIPA Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Xyris_FF_Custom_TIPA
+          path: packages/*.tipa

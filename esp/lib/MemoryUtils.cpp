@@ -27,7 +27,7 @@ pid_t GetGameProcesspid(char* GameProcessName) {
             const char *procname = procBuffer[i].kp_proc.p_comm;
             pid_t Processpid = procBuffer[i].kp_proc.p_pid;
             
-            if (strstr(procname, GameProcessName)) {
+            if (strstr(procname, GameProcessName) || strcasestr(procname, GameProcessName) || strcasestr(procname, "freefire") || strcasestr(procname, "ff")) {
                 free(procBuffer);
                 return Processpid;
             }
