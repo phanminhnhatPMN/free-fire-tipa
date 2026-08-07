@@ -29,9 +29,12 @@ jobs:
           export THEOS=$HOME/theos
           make clean
           make package FINALPACKAGE=1
+          ls -la packages/
 
       - name: Upload TIPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Xyris_FF_Custom_TIPA
-          path: packages/*.tipa
+          path: |
+            packages/*.tipa
+            *.tipa
