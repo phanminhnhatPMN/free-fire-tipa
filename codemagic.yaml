@@ -1,0 +1,25 @@
+workflows:
+  ios-theos-build:
+    name: Build iOS TIPA
+    instance_type: mac_mini_m1
+    max_build_duration: 15
+    environment:
+      vars:
+        THEOS: $CM_BUILD_DIR/theos
+    scripts:
+      - name: Setup Theos Toolchain
+        script: |
+          git clone --recursive https://github.com/theos/theos.git $THEOS
+          curl -LO https://github.com/theos/sdks/archive/refs/heads/master.zip
+          unzip -q master.zip
+          mkdir -p $THEOS/sdks
+          cp -r sdks-master/* $THEOS/sdks/
+      - name: Build TIPA Package
+        script: |
+          make clean
+          make package FINALPACKAGE=1
+          cp packages/*.tipa $CM_BUILD_DIR/Xyris_CodeMagic.tipa
+    artifacts:
+      - *.tipa
+      - packages/*.tipa
+      - Xyris_CodeMagic.tipa
