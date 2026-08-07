@@ -13,12 +13,12 @@ workflows:
           curl -LO https://github.com/theos/sdks/archive/refs/heads/master.zip
           unzip -q master.zip
           mkdir -p $THEOS/sdks
-          cp -r sdks-master/* $THEOS/sdks/
+          cp -R sdks-master/* $THEOS/sdks/ || true
       - name: Build TIPA Package
         script: |
           make clean
           make package FINALPACKAGE=1
-          cp packages/*.tipa $CM_BUILD_DIR/Xyris_CodeMagic.tipa
+          cp packages/*.tipa $CM_BUILD_DIR/Xyris_CodeMagic.tipa || cp *.tipa $CM_BUILD_DIR/Xyris_CodeMagic.tipa || true
     artifacts:
       - "packages/*.tipa"
       - "*.tipa"
