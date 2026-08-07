@@ -64,13 +64,13 @@ static float aimDistance = 200.0f; // Khoảng cách aim mặc định
 }
 @end
 
-@interface TrisOverlayView ()
+@interface MenuView ()
 @property (nonatomic, strong) CADisplayLink *displayLink;
 @property (nonatomic, strong) NSMutableArray<CALayer *> *drawingLayers;
 - (void)renderESPToLayers:(NSMutableArray<CALayer *> *)layers;
 @end
 
-@implementation TrisOverlayView {
+@implementation MenuView {
     UIView *menuContainer;
     UIView *floatingButton;
     CGPoint _initialTouchPoint;
@@ -897,21 +897,3 @@ bool get_IsVisible(uint64_t player) {
 }
 
 @end
-
-__attribute__((constructor))
-static void initializeTrisCustomOverlay(void) {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        static UIWindow *gTrisOverlayWindow = nil;
-        CGRect screenFrame = [UIScreen mainScreen].bounds;
-        gTrisOverlayWindow = [[UIWindow alloc] initWithFrame:screenFrame];
-        gTrisOverlayWindow.windowLevel = UIWindowLevelStatusBar + 500;
-        gTrisOverlayWindow.backgroundColor = [UIColor clearColor];
-        gTrisOverlayWindow.userInteractionEnabled = YES;
-        
-        TrisOverlayView *overlayView = [[TrisOverlayView alloc] initWithFrame:screenFrame];
-        UIViewController *vc = [[UIViewController alloc] init];
-        vc.view = overlayView;
-        gTrisOverlayWindow.rootViewController = vc;
-        gTrisOverlayWindow.hidden = NO;
-    });
-}

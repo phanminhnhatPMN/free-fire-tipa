@@ -8,7 +8,7 @@ struct ESPBox {
     CGFloat height;
 };
 
-@interface TrisOverlayView : UIView
+@interface MenuView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)hideMenu;
