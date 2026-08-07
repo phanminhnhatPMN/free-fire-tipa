@@ -7,17 +7,24 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
-      - name: Setup Theos
+      - name: Install Toolchain & Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld llvm build-essential zip git libtinfo5
+
+      - name: Setup Theos & Toolchain
         run: |
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          curl -LO https://github.com/theos/sdks/archive/master.zip
+          unzip -q master.zip
+          mkdir -p $HOME/theos/sdks
+          mv sdks-master/* $HOME/theos/sdks/
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
 
       - name: Build TIPA Package
