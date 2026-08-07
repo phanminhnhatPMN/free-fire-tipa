@@ -8,13 +8,12 @@ struct ESPBox {
     CGFloat height;
 };
 
-@interface MenuView : UIView
+@interface PMNDevOverlayView : UIView
 
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)hideMenu;
 - (void)showMenu;
 - (void)handlePan:(UIPanGestureRecognizer *)gesture;
-- (void)layoutSubviews;
 - (void)centerMenu;
 
 @end
