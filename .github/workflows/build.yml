@@ -7,27 +7,31 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-13
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Install Toolchain & Build
+      - name: Setup Theos Toolchain
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential zip git
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
           curl -LO https://github.com/theos/sdks/archive/refs/heads/master.zip
           unzip -q master.zip
           mkdir -p $HOME/theos/sdks
           cp -r sdks-master/* $HOME/theos/sdks/
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+
+      - name: Build TIPA Package
+        run: |
           export THEOS=$HOME/theos
           make clean
           make package FINALPACKAGE=1
+          cp packages/*.tipa ./Xyris_Compiled.tipa
+          ls -la
 
       - name: Upload TIPA Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: Xyris_FF_Custom_TIPA
-          path: packages/*.tipa
+          path: ./Xyris_Compiled.tipa
