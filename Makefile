@@ -5,7 +5,6 @@ INSTALL_TARGET_PROCESSES := Xyris
 
 include $(THEOS)/makefiles/common.mk
 
-
 APPLICATION_NAME := Xyris
 PACKAGE_NAME := xyris
 
@@ -21,7 +20,7 @@ Xyris_CFLAGS += -fobjc-arc \
 
 Xyris_CFLAGS += -Iinclude
 Xyris_CFLAGS += -include hud-prefix.pch
-Xyris_LDFLAGS += Core.a
+Xyris_LDFLAGS += Core.a -Wl,-undefined,dynamic_lookup
 
 Xyris_CCFLAGS += -std=c++14
 Xyris_CCFLAGS += -DNOTIFY_LAUNCHED_HUD=\"ch.xxtou.notification.hud.launched\"
@@ -30,11 +29,8 @@ Xyris_CCFLAGS += -DNOTIFY_RELOAD_HUD=\"ch.xxtou.notification.hud.reload\"
 Xyris_CCFLAGS += -DNOTIFY_RELOAD_APP=\"ch.xxtou.notification.app.reload\"
 
 Xyris_FRAMEWORKS += CoreGraphics QuartzCore UIKit Foundation
-Xyris_PRIVATE_FRAMEWORKS += BackBoardServices GraphicsServices IOKit SpringBoardServices
 
 Xyris_CODESIGN_FLAGS += -Sent.plist
-
-
 
 include $(THEOS_MAKE_PATH)/application.mk
 include $(THEOS_MAKE_PATH)/aggregate.mk

@@ -4,27 +4,39 @@
 
 uint64_t getMatchGame(uint64_t Moudule_Base) {
     uint64_t GameFacade_TypeInfo = ReadAddr<uint64_t>(Moudule_Base + 0xC012848);
+    if (GameFacade_TypeInfo == 0) return 0;
     uint64_t GameFacade_Static = ReadAddr<uint64_t>(GameFacade_TypeInfo + 0xB8);
-    return ReadAddr<uint64_t>(GameFacade_Static + 0x0);
+    if (GameFacade_Static == 0) return 0;
+    uint64_t matchGame = ReadAddr<uint64_t>(GameFacade_Static + 0x8);
+    if (matchGame == 0) {
+        matchGame = ReadAddr<uint64_t>(GameFacade_Static + 0x0);
+    }
+    return matchGame;
 }
 
 uint64_t getMatch(uint64_t matchgame) {
+    if (matchgame == 0) return 0;
     return ReadAddr<uint64_t>(matchgame + 0x90);
 }
 
 uint64_t getLocalPlayer(uint64_t match) {
+    if (match == 0) return 0;
     return ReadAddr<uint64_t>(match + 0x58);
 }
 
 uint64_t CameraMain(uint64_t matchgame) {
+    if (matchgame == 0) return 0;
     uint64_t CameraControllerManager = ReadAddr<uint64_t>(matchgame + 0xD8);
+    if (CameraControllerManager == 0) return 0;
     return ReadAddr<uint64_t>(CameraControllerManager + 0x18);
 }
 
 float* GetViewMatrix(uint64_t cameraMain) {
+    static float matrix[16] = {0};
+    if (cameraMain == 0) return matrix;
     uint64_t v1 = ReadAddr<uint64_t>(cameraMain + 0x10);
+    if (v1 == 0) return matrix;
     
-    static float matrix[16];
     for (int i = 0; i < 16; i++) {
         matrix[i] = ReadAddr<float>(v1 + 0xD8 + i * 0x4);
     }
@@ -33,65 +45,78 @@ float* GetViewMatrix(uint64_t cameraMain) {
 }
 
 uint64_t getTransNode(uint64_t BodyPart) {
+    if (BodyPart == 0) return 0;
     return ReadAddr<uint64_t>(BodyPart + 0x10);
 }
 
 uint64_t getHead(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x630); // HeadNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getHip(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x638); // HipNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getLeftAnkle(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x668); // m_LeftAnkleNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getRightAnkle(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x670); // m_RightAnkleNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getRightToeNode(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x680); // m_RightToeNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getLeftShoulder(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x698); // m_LeftArmNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getLeftElbow(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x6C0); // m_LeftForeArmNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getLeftHand(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x6B0); // m_LeftHandNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getRightShoulder(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x6A0); // m_RightArmNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getRightElbow(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x6B8); // m_RightForeArmNode
     return getTransNode(BodyPart);
 }
 
 uint64_t getRightHand(uint64_t player) {
+    if (player == 0) return 0;
     uint64_t BodyPart = ReadAddr<uint64_t>(player + 0x6A8); // m_RightHandNode
     return getTransNode(BodyPart);
 }
 
 bool isLocalTeamMate(uint64_t localPlayer, uint64_t Player) {
+    if (localPlayer == 0 || Player == 0) return false;
     COW_GamePlay_PlayerID_o myPlayerID = ReadAddr<COW_GamePlay_PlayerID_o>(localPlayer + 0x2D0);
     COW_GamePlay_PlayerID_o PlayerID = ReadAddr<COW_GamePlay_PlayerID_o>(Player + 0x2D0);
     
@@ -102,6 +127,7 @@ bool isLocalTeamMate(uint64_t localPlayer, uint64_t Player) {
 }
 
 int GetDataUInt16(uint64_t player, int varID) {
+    if (player == 0) return 0;
     uint64_t IPRIDataPool = ReadAddr<uint64_t>(player + 0x68);
     if (isVaildPtr(IPRIDataPool)) {
         uint64_t v2 = ReadAddr<uint64_t>(IPRIDataPool + 0x10);
@@ -119,4 +145,3 @@ int get_CurHP(uint64_t Player) {
 int get_MaxHP(uint64_t Player) {
     return GetDataUInt16(Player, 1);
 }
-
